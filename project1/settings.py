@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_tables2',
     'welcome',
+    'pivottable',
     
 ]
 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WebDataRocks Example</title>
+<link rel="stylesheet" href="https://cdn.webdatarocks.com/latest/webdatarocks.min.css" />
+</head>
+<body>
+    <nav class="navbar navbar-light" style="background-color:#FF0033;">
+        <a href="{% url 'index' %}" class="navbar-brand" style="background-color:#FFCC33;color:#000000;border-width:10px;border-color:#FFCC33;border-style:solid;border-spacing:30px;border-radius: 5px;">Home</a>
+<script src="https://cdn.webdatarocks.com/latest/webdatarocks.toolbar.min.js"></script>
+<script src="https://cdn.webdatarocks.com/latest/webdatarocks.js"></script>
+<script src="https://cdn.webdatarocks.com/latest/webdatarocks.googlecharts.js"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<h1>WebDataRocks Integration with Django</h1>
+<table><tr><td style="width: 750px;"><div id="wdr-component"></div></td>
+    <td><div id="googlechart-container" style="width:400px;height:450px;"></div></td></tr></table>
+    
+
+<script>
+var pivot = new WebDataRocks({
+    container: "#wdr-component",
+    toolbar: true,
+    height: 450,
+    customizeCell: customizeCellFunction,
+    report: {
+        dataSource: {
+            filename: ""
+        },
+        formats: [{
+            maxDecimalPlaces: 2
+        }],
+        slice: {
+            rows: [{
+                "uniqueName": "Business Type"
+            }],
+            columns: [{
+                "uniqueName": "Country"
+            }],
+            measures: [{
+                "uniqueName": "Price",
+                "aggregation": "average"
+            }]
+        }
+    },
+    reportcomplete: function() {
+        pivot.off("reportcomplete");
+        pivotTableReportComplete = true;
+        createGoogleChart();
+    }
+});
+var pivotTableReportComplete = false;
+var googleChartsLoaded = false;
+
+google.charts.load('current', {
+    'packages': ['corechart']
+});
+google.charts.setOnLoadCallback(onGoogleChartsLoaded);
+
+function onGoogleChartsLoaded() {
+    googleChartsLoaded = true;
+    if (pivotTableReportComplete) {
+        createGoogleChart();
+    }
+}
+
+function createGoogleChart() {
+    if (googleChartsLoaded) {
+
+        pivot.googlecharts.getData({
+                type: "pie"
+            },
+            drawChart,
+            drawChart
+        );
+    }
+}
+
+function drawChart(_data) {
+    var data = google.visualization.arrayToDataTable(_data.data);
+
+    var options = {
+        title: "Average Price of Business Type Products",
+        legend: {
+            position: 'right'
+        },
+        is3D: true
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('googlechart-container'));
+    chart.draw(data, options);
+}
+
+
+
+function customizeCellFunction(cell, data) {
+    if (data.rows) {
+        for (var i = 0; i < data.rows.length; i++) {
+            if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Specialty Bike Shop") {
+                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
+                cell.attr["member"] = data.rows[i]["caption"];
+            } else if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Value Added Reseller") {
+                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
+                cell.attr["member"] = data.rows[i]["caption"];
+            } else if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Warehouse") {
+                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
+                cell.attr["member"] = data.rows[i]["caption"];
+            } 
+        }
+    }
+}
+</script>
+</body>
+</html>
