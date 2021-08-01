@@ -21,27 +21,78 @@
 var pivot = new WebDataRocks({
     container: "#wdr-component",
     toolbar: true,
-    height: 450,
-    customizeCell: customizeCellFunction,
     report: {
         dataSource: {
-            filename: ""
+            data: getData()
         },
         formats: [{
             maxDecimalPlaces: 2
         }],
-        slice: {
-            rows: [{
-                "uniqueName": "Business Type"
-            }],
-            columns: [{
-                "uniqueName": "Country"
-            }],
-            measures: [{
-                "uniqueName": "Price",
-                "aggregation": "average"
-            }]
+        "slice": {
+        "rows": [
+            {
+                "uniqueName": "Period"
+            }
+        ],
+        "columns": [
+            {
+                "uniqueName": "Customer Country",
+                "filter": {
+                    "type": "top",
+                    "quantity": 2,
+                    "measure": "Incremental Sales"
+                },
+                "sort": "unsorted"
+            },
+            {
+                "uniqueName": "Measures"
+            }
+        ],
+        "measures": [
+            {
+                "uniqueName": "Incremental Sales",
+                "aggregation": "sum"
+            }
+        ],
+        "sorting": {
+            "row": {
+                "type": "desc",
+                "tuple": [],
+                "measure": "Incremental Sales"
+            },
+            "column": {
+                "type": "desc",
+                "tuple": [
+                    "Customer Country.Canada"
+                ],
+                "measure": "Incremental Sales"
+            }
+        },
+        "drills": {
+            "rows": [
+                {
+                    "tuple": [
+                        "Period.Quarter.2017/Quarter 3"
+                    ]
+                },
+                {
+                    "tuple": [
+                        "Period.Quarter.2018/Quarter 3"
+                    ]
+                },
+                {
+                    "tuple": [
+                        "Period.2017"
+                    ]
+                },
+                {
+                    "tuple": [
+                        "Period.2018"
+                    ]
+                }
+            ]
         }
+    }
     },
     reportcomplete: function() {
         pivot.off("reportcomplete");
@@ -49,6 +100,7 @@ var pivot = new WebDataRocks({
         createGoogleChart();
     }
 });
+
 var pivotTableReportComplete = false;
 var googleChartsLoaded = false;
 
@@ -66,9 +118,8 @@ function onGoogleChartsLoaded() {
 
 function createGoogleChart() {
     if (googleChartsLoaded) {
-
         pivot.googlecharts.getData({
-                type: "pie"
+                type: "column"
             },
             drawChart,
             drawChart
@@ -80,34 +131,29 @@ function drawChart(_data) {
     var data = google.visualization.arrayToDataTable(_data.data);
 
     var options = {
-        title: "Average Price of Business Type Products",
+        title: "Sum of incremental sales over years",
         legend: {
-            position: 'right'
+            position: 'top'
         },
-        is3D: true
+        is3D: true,
+        colors: ['#66ccff', '#e0440e']
     };
 
-    var chart = new google.visualization.PieChart(document.getElementById('googlechart-container'));
+    var chart = new google.visualization.ColumnChart(document.getElementById('googlechart-container'));
     chart.draw(data, options);
 }
 
 
-
-function customizeCellFunction(cell, data) {
-    if (data.rows) {
-        for (var i = 0; i < data.rows.length; i++) {
-            if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Specialty Bike Shop") {
-                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
-                cell.attr["member"] = data.rows[i]["caption"];
-            } else if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Value Added Reseller") {
-                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
-                cell.attr["member"] = data.rows[i]["caption"];
-            } else if (data.rows[i]["hierarchyCaption"] == "Business Type" && data.rows[i]["caption"] == "Warehouse") {
-                cell.attr["hierarchy"] = data.rows[i]["hierarchyCaption"];
-                cell.attr["member"] = data.rows[i]["caption"];
-            } 
+function getData() {
+    return [{
+            "Stock_Name": {
+                "type": "string"
+            },
+            "avg_compound": {
+                "type": "number"
+            }
         }
-    }
+    ]
 }
 </script>
 </body>
