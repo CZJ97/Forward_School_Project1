@@ -6,6 +6,6 @@ class UserProfileInfo(models.Model):
     occupation = models.TextField(blank=True)
     company = models.TextField(blank=True)
     MonthlySalary = models.TextField(blank=True)
-def __str__(self):
-    return self.user.username
+    def __str__(self):
+        return self.user.username
     
