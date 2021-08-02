@@ -1,0 +1,126 @@
+{% extends "analysis/base.html" %}
+{% block body_block %}
+<div style="text-align:center">
+  <h1>
+    Welcome to Stock NLP &amp; Sentimental Analysis!
+  </h1>
+    <div class="container-fluid">
+        <div class="row">
+             <b>* Note 1:</b> 
+             Stock trends are derived from a number of activities related to the stock, each given a weightage and score. The activities contributing to stock scores include: 
+             <ul>
+                <li>Searches on a stock</li>
+                <li>News &amp; blog posts covering a stock</li>
+                <li>Price target for a stock</li>
+                <li>Announcement on a stock</li>
+                <li>Stock entitlement (bonus, dividend, split, consolidation)</li>
+            </ul>
+            <br>
+            <b>* Note 2:</b> 
+            The scores are normalised to have maximum score of 1000. Stock with the highest score has the most activities in the past 2 days.
+            <br>
+            Click below button to view NLP &amp; Sentimental Analysis results
+            <br><br>
+        </div>
+
+        <div class="row">
+            <div class="col-3">
+                <button onclick="getPandas()">TOP 30 HOT STOCK</button>
+            </div>
+
+            <div id="pandas" class="col-9">
+            </div>
+        <div>
+
+        <br><br><br><br><br><br><br><br>
+
+        <label>Enter Stock Name:</label>
+        <input id="stock_name" type="text" placeholder="GENM, TOPGLOV, AIRASIA...">
+                {% comment %} <label>Choose Keywords Models:</label>
+                <select name="top_n" id="top_n">
+                    <option value="n1">Unigrams</option>
+                    <option value="n2">Bigrams</option>
+                    <option value="n3">Trigrams</option>
+                </select> {% endcomment %}
+        <br><br>
+
+        <div class="row">
+            <div class="col-3">
+                <button onclick="getUnigrams()">Visualize Top Unigrams Keywords</button>
+            </div>
+
+            <div class="col-9">
+                <img id="unigrams">
+            </div>
+        <div>
+
+        <br><br><br><br>
+
+        <div class="row">
+            <div class="col-3">
+                <button onclick="getBigrams()">Visualize Top Bigrams Keywords</button>
+            </div>
+
+            <div class="col-9">
+                <img id="bigrams">
+            </div>
+            <br><br><br><br>
+        <div>
+
+        <br><br><br><br>
+        
+        <div class="row">
+            <div class="col-3">
+                <button onclick="getTrigrams()">Visualize Top Trigrams Keywords</button>
+            </div>
+
+            <div class="col-9">
+                <img id="trigrams">
+            </div>
+            <br><br><br><br>
+        <div>
+
+    </div>
+</div>
+<script>
+    // Make API calls
+    
+    function getPandas() {
+		fetch('{% url 'analysis:get-data' %}')
+		.then(res => res.text())
+		.then(data => document.getElementById('pandas').innerHTML = data)
+	}
+
+    function getUnigrams() {
+        var val_list = document.getElementById('stock_name').value;
+		fetch('{% url 'analysis:get-unigrams-graph' %}'+"?val="+val_list)
+		.then(res => res.blob())
+		.then(data => {
+            let imgURL = URL.createObjectURL(data)
+            document.getElementById('unigrams').src = imgURL
+        })
+	}
+
+    function getBigrams() {
+        var val_list = document.getElementById('stock_name').value;
+		fetch('{% url 'analysis:get-bigrams-graph' %}'+"?val="+val_list)
+		.then(res => res.blob())
+		.then(data => {
+            let imgURL = URL.createObjectURL(data)
+            document.getElementById('bigrams').src = imgURL
+        })
+	}
+
+    function getTrigrams() {
+        var val_list = document.getElementById('stock_name').value;
+		fetch('{% url 'analysis:get-trigrams-graph' %}'+"?val="+val_list)
+		.then(res => res.blob())
+		.then(data => {
+            let imgURL = URL.createObjectURL(data)
+            document.getElementById('trigrams').src = imgURL
+        })
+	}
+    
+</script>
+{% endblock %}
+

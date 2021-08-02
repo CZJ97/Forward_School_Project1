@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url,include
 from welcome import views
-#from combine import views
+# from analysis import views
 from project1.settings import DEBUG, STATIC_URL, STATIC_DIR, MEDIA_URL,MEDIA_ROOT
 from django.conf.urls.static import static
 
@@ -29,7 +29,8 @@ urlpatterns = [
     url(r'^special/',views.special,name='special'),
     url(r'^welcome/',include('welcome.urls')),
     url(r'^logout/$',views.user_logout, name='logout'),
-    url(r'^pivottable/',include('pivottable.urls'))
+    url(r'^pivottable/',include('pivottable.urls')),
+    url(r'^analysis/',include('analysis.urls'))
 
 ]
 
